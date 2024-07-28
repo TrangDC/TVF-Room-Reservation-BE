@@ -1,0 +1,22 @@
+type User {
+  id: UUID!
+  name: String!
+  workEmail: String!
+}
+
+type UserData {
+  id: UUID!
+  name: String!
+  workEmail: String!
+  roles: [Role!]!
+}
+
+type UserDataResponse {
+  total: Int!
+  data: [UserData!]!
+}
+
+type UserResponse {
+  message: String!
+  user: UserData!
+}

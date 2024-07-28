@@ -1,0 +1,33 @@
+directive @hasRole(roles: [String!]!) on FIELD_DEFINITION
+
+type Mutation {
+  # Office
+  CreateOffice(input: CreateOfficeInput!): OfficeResponse!
+    @hasRole(roles: ["super_admin", "administrator"])
+  UpdateOffice(input: UpdateOfficeInput!): OfficeResponse!
+    @hasRole(roles: ["super_admin", "administrator"])
+  DeleteOffice(officeID: UUID!): String!
+    @hasRole(roles: ["super_admin", "administrator"])
+
+  # Room
+  CreateRoom(input: CreateRoomInput!): RoomResponse!
+    @hasRole(roles: ["super_admin", "administrator"])
+  UpdateRoom(input: UpdateRoomInput!): RoomResponse!
+    @hasRole(roles: ["super_admin", "administrator"])
+  DeleteRoom(roomID: UUID!): String!
+    @hasRole(roles: ["super_admin", "administrator"])
+
+  # Booking
+  CreateBooking(input: CreateBookingInput!): BookingResponse!
+    @hasRole(roles: ["super_admin", "administrator"])
+  UpdateBooking(input: UpdateBookingInput!): BookingResponse!
+    @hasRole(roles: ["super_admin", "administrator"])
+  CancelBooking(bookingID: UUID!): String!
+    @hasRole(roles: ["super_admin", "administrator"])
+
+  # User role
+  AssignRole(input: AssignRoleInput!): UserResponse!
+    @hasRole(roles: ["super_admin"])
+  UnassignRole(input: UnassignRoleInput!): UserResponse!
+    @hasRole(roles: ["super_admin"])
+}

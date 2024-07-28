@@ -1,0 +1,7 @@
+type AuthenticationToken {
+  accessToken: String!
+  refreshToken: String!
+  tokenType: String!
+  expiresAt: Time!
+  email: String!
+}

@@ -1,0 +1,67 @@
+# Original
+type Room {
+  id: UUID!
+  name: String!
+  color: String!
+  floor: String!
+  officeId: UUID!
+  description: String
+  imageUrl: String
+}
+
+# Response
+type AvailableRoomResponse {
+  id: UUID!
+  name: String!
+  color: String!
+  floor: String!
+  officeId: UUID!
+  description: String
+  imageUrl: String
+  status: Boolean!
+}
+
+type RoomResponse {
+  message: String!
+  data: Room!
+}
+
+type RoomDataResponse {
+  total: Int!
+  data: [Room!]!
+}
+
+# Filter
+input RoomFilter {
+  officeId: UUID!
+  searchTerm: String
+}
+
+# Input
+input CreateRoomInput {
+  name: String!
+  color: String!
+  floor: String!
+  officeId: UUID!
+  description: String
+  imageUrl: String
+}
+
+input UpdateRoomInput {
+  id: UUID!
+  name: String
+  color: String
+  floor: String
+  officeId: UUID
+  description: String
+  imageUrl: String
+}
+
+input GetAvailableRoomInput {
+  startDate: String!
+  startTime: String
+  endTime: String
+  isRepeat: Boolean
+  endDate: String
+  officeId: UUID!
+}

@@ -1,0 +1,19 @@
+app:
+  name: $APP_NAME
+  environment: $APP_ENVIRONMENT
+  version: $APP_VERSION
+  serviceName: $APP_SERVICE_NAME
+  serverName: $APP_SERVER_NAME
+  debug: $APP_DEBUG
+
+postgres:
+  connectionString: $POSTGRES_CONNECTION_STRING
+
+azureAD:
+  enabled: $AZURE_AD_ENABLE
+  clientID: $AZURE_AD_CLIENT_ID
+  clientSecret: $AZURE_AD_CLIENT_SECRET
+  tenantID: $AZURE_AD_CLIENT_TENANT_ID
+  redirectUrl: $AZURE_AD_REDIRECT_URL
+  scopes: $AZURE_AD_SCOPES
+  clientRedirectURL: $AZURE_AD_CLIENT_REDIRECT_URL

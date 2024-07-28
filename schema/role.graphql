@@ -1,0 +1,16 @@
+type Role {
+  id: UUID!
+  machineName: String!
+  name: String!
+  description: String
+}
+
+input AssignRoleInput {
+  workEmail: String!
+  roleID: UUID!
+}
+
+input UnassignRoleInput {
+  workEmail: String!
+  roleID: UUID!
+}

@@ -1,0 +1,8 @@
+scalar DateTime
+scalar Time
+scalar UUID
+
+input PaginationInput {
+  page: Int
+  perPage: Int
+}

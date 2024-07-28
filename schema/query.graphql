@@ -1,0 +1,36 @@
+type Query {
+  # Office
+  GetOffices: [OfficeDTO!]!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+  GetOffice(officeID: UUID!): OfficeDTO!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+
+  # Room
+  GetRooms(pagination: PaginationInput, filter: RoomFilter!): RoomDataResponse!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+  GetRoom(roomID: UUID!): Room!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+  GetAvailableRooms(input: GetAvailableRoomInput!): [AvailableRoomResponse!]!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+
+  # Booking
+  GetBookings(
+    pagination: PaginationInput
+    filter: BookingFilter
+  ): BookingDataResponse!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+  GetBooking(bookingID: UUID!): BookingData!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+
+  # User
+  GetUserByOID(oID: UUID!): UserData!
+    @hasRole(roles: ["super_admin", "administrator", "user"])
+  GetAdminUsers(
+    pagination: PaginationInput
+    keyword: String
+  ): UserDataResponse! @hasRole(roles: ["super_admin"])
+
+  # Role
+  GetRoles: [Role!]! @hasRole(roles: ["super_admin"])
+  GetRole(roleID: UUID!): Role! @hasRole(roles: ["super_admin"])
+}

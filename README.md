@@ -1,6 +1,4 @@
-# meeting-room-reservation-backend
-
-
+# meeting-room-reservation-be
 
 ## Getting started
 
@@ -15,79 +13,100 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.techvify.dev/its/tvf-internal-project/meeting-room-reservation/meeting-room-reservation-backend.git
+git remote add origin https://gitlab.techvify.dev/its/internship/q2-2024/project/meeting-room-reservation/meeting-room-reservation-be.git
 git branch -M main
 git push -uf origin main
 ```
 
-## Integrate with your tools
+## Local Development
 
-- [ ] [Set up project integrations](https://gitlab.techvify.dev/its/tvf-internal-project/meeting-room-reservation/meeting-room-reservation-backend/-/settings/integrations)
+### Software & Hardware requirements
 
-## Collaborate with your team
+- We prefer to use the `*nix` Operating System to run all systems
+- You must install the [Docker Desktop](https://www.docker.com/products/docker-desktop/) and Docker Compose on your local desktop to spin up all systems with 1 command
+- Change your Docker Desktop resource capacity to at least 8GB RAM and 4 vCPU
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Database Migrations [Optional]
 
-## Test and Deploy
+- Installing [atlasgo](https://atlasgo.io/integrations/go-api#installation) CLI first
+- Setup POSTGRESQL_CONNECTION_STRING env variable:
 
-Use the built-in continuous integration in GitLab.
+```bash
+  export POSTGRES_CONNECTION_STRING="postgres://backend_user:backend_password@localhost:5432/backend_db?sslmode=disable"
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+- Execute up migrations by:
 
-***
+```bash
+make migratedb
+```
 
-# Editing this README
+--- generate migration file
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```
+atlas migrate hash
+atlas migrate new <file_name>
+```
 
-## Suggestions for a good README
+### Run Application by Docker-Compose
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- Start docker and run docker-compose by use your terminal
 
-## Name
-Choose a self-explaining name for your project.
+```bash
+docker-compose up
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+- Clean up everything created by docker-compose by use your terminal
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```bash
+docker-compose down
+docker volume prune -y
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- The docker-compose will bootstrap a required database to working with source code includes:
+  - Database: `backend_db`
+    - username: `backend_user`
+    - password: `backend_password`
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Run Applicationn in your terminal
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- You need to setup all required software before running the application
+- Please run migrations before running the application
+- Run the backend_api:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```make
+make api
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### How to test
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+- You can access
+  - Backend via http://localhost:8080 (GraphQL Playground) and http://localhost:8080/graphql (GraphQL Server)
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## Project Structure
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+- cmd: It contains cobra command to build CLI command to execute run a server. For example: `./server api` to run API and `./server worker` to run Worker.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+- config: It contains all config structures which are parsed from the `config.yaml` file.
 
-## License
-For open source projects, say how it is licensed.
+- directives: It contains custom directives and bind them to implementation functions in Go code.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- migrations: It contains all database migrations. Please setup [atlasgo migrate tool](https://atlasgo.io/integrations/go-api#installation) to uses it.
+
+- graphql: It contains all code generated by `gqlgen` for GraphQL Server. You can figure it [here](https://github.com/99designs/gqlgen).
+
+- internal: It contains all internal interfaces/apis can shared for different packages. For example: Logger, Mailer, PostgreSQL, etc. It also contains utility functions.
+
+- middleware: It contains all middleware for the GraphQL server.
+
+- ent: It contains all model generated by GraphQL, and use with ent for query SQL.
+
+- resolver: It contains all resolvers generated by `gqlgen` to resolve the GraphQL schemas.
+
+- service: It contains all business logic services.
+
+- template: It contains all template files for example HTML.
+
+- repositories: It's contains all query working with ent client.
+
+- rest: It's contains all controller working with REST.

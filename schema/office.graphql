@@ -1,0 +1,28 @@
+type Office {
+  id: UUID!
+  name: String!
+  description: String
+}
+
+type OfficeDTO {
+  id: UUID!
+  name: String!
+  description: String
+  rooms: [Room!]!
+}
+
+type OfficeResponse {
+  message: String!
+  data: Office!
+}
+
+input CreateOfficeInput {
+  name: String!
+  description: String
+}
+
+input UpdateOfficeInput {
+  id: UUID!
+  name: String
+  description: String
+}

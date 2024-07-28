@@ -1,0 +1,59 @@
+include: "/.gitlab/.gitlab-ci.template.yml"
+
+.dev:
+  variables:
+    CONTAINER_APP_NAME: techvify-dev-roomreservation-backend
+    RESOURCE_GROUP: techvify-dev-container-rg
+    POSTGRES_CONNECTION_STRING: ${DEV_POSTGRES_CONNECTION_STRING}
+  rules:
+    - if: $PIPELINE_NAME == "CD" && $ENVIRONMENT == "development"
+    - when: never
+
+.prod:
+  variables:
+    CONTAINER_APP_NAME: techvify-prod-roomreservation-backend
+    RESOURCE_GROUP: techvify-prod-container-rg
+    POSTGRES_CONNECTION_STRING: ${PROD_POSTGRES_CONNECTION_STRING}
+  rules:
+    - if: $PIPELINE_NAME == "CD" && $ENVIRONMENT == "production"
+    - when: never
+
+#############################################
+## DEV ENVIRONMENT
+#############################################
+migrate-dry-run-dev:
+  extends:
+    - .dev
+    - .migrate-dry-run
+
+migrate-apply-dev:
+  extends:
+    - .dev
+    - .migrate-apply
+  needs:
+    - migrate-dry-run-dev
+
+deploy-dev:
+  extends:
+    - .dev
+    - .deploy
+
+#############################################
+## PROD ENVIRONMENT
+#############################################
+migrate-dry-run-prod:
+  extends:
+    - .prod
+    - .migrate-dry-run
+
+migrate-apply-prod:
+  extends:
+    - .prod
+    - .migrate-apply
+  needs:
+    - migrate-dry-run-prod
+
+deploy-prod:
+  extends:
+    - .prod
+    - .deploy

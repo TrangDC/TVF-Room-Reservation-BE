@@ -217,7 +217,7 @@ build:
   when: manual
   variables:
     DOCKER_IMAGE_NAME: "${SHARED_REGISTRY}/roomreservation/backend"
-    KUSTOMIZATION_PATH: "roomreservation-devops/k8s/roomreservation-backend/envs/${ENVIRONMENT}"
+    KUSTOMIZATION_PATH: "meeting-room-reservation-devops/k8s/room-reservation-backend/envs/${ENVIRONMENT}"
   needs:
     - job: build
       artifacts: false
@@ -234,7 +234,7 @@ build:
 
   script:
     - echo "Deploying roomreservation backend with new image ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-    - git clone https://oauth2:$CI_TOKEN@gitlab.techvify.dev/its/internship/q2-2024/project/roomreservation-devops.git
+    - git clone https://oauth2:$CI_TOKEN@gitlab.techvify.dev/its/tvf-internal-project/meeting-room-reservation/meeting-room-reservation-devops.git
     - cd ${KUSTOMIZATION_PATH}
       sed -i "s|newTag:.*|newTag: ${DOCKER_IMAGE_TAG}|g" kustomization.yaml
     - echo "Commiting changes..."

@@ -236,6 +236,7 @@ build:
     - echo "Deploying roomreservation backend with new image ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
     - git clone https://oauth2:$CI_TOKEN@gitlab.techvify.dev/its/tvf-internal-project/meeting-room-reservation/meeting-room-reservation-devops.git
     - cd ${KUSTOMIZATION_PATH}
+    - |
       sed -i "s|newTag:.*|newTag: ${DOCKER_IMAGE_TAG}|g" kustomization.yaml
     - echo "Commiting changes..."
     - git add .

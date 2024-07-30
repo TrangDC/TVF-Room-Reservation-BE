@@ -40,7 +40,7 @@ stages:
   - az account set --subscription ${SUBSCRIPTION_ID}
 
 golangci-lint:
-  image: ${DOCKER_REGISTRY_PROXY}/golangci/golangci-lint:v1.55-alpine
+  image: ${DOCKER_REGISTRY_PROXY}/golangci/golangci-lint:v1.59.1-alpine
   stage: ci
   before_script:
     - apk add jq

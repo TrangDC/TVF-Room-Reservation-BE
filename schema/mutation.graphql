@@ -19,7 +19,7 @@ type Mutation {
 
   # Booking
   CreateBooking(input: CreateBookingInput!): BookingResponse!
-    @hasRole(roles: ["super_admin", "administrator"])
+    @hasRole(roles: ["super_admin", "administrator", "user"])
   UpdateBooking(input: UpdateBookingInput!): BookingResponse!
     @hasRole(roles: ["super_admin", "administrator"])
   CancelBooking(bookingID: UUID!): String!

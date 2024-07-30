@@ -33,10 +33,10 @@ migrate-apply-dev:
   needs:
     - migrate-dry-run-dev
 
-# deploy-dev:
-#   extends:
-#     - .dev
-#     - .deploy
+deploy-dev:
+  extends:
+    - .dev
+    - .deploy
 
 #############################################
 ## PROD ENVIRONMENT

@@ -1238,7 +1238,7 @@ type Mutation {
 
   # Booking
   CreateBooking(input: CreateBookingInput!): BookingResponse!
-    @hasRole(roles: ["super_admin", "administrator"])
+    @hasRole(roles: ["super_admin", "administrator", "user"])
   UpdateBooking(input: UpdateBookingInput!): BookingResponse!
     @hasRole(roles: ["super_admin", "administrator"])
   CancelBooking(bookingID: UUID!): String!
@@ -3996,7 +3996,7 @@ func (ec *executionContext) _Mutation_CreateBooking(ctx context.Context, field g
 			return ec.resolvers.Mutation().CreateBooking(rctx, fc.Args["input"].(ent.CreateBookingInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			roles, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"super_admin", "administrator"})
+			roles, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"super_admin", "administrator", "user"})
 			if err != nil {
 				return nil, err
 			}

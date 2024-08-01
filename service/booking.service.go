@@ -578,7 +578,7 @@ func validateBookingTime(ctx context.Context, startDate, endDate time.Time) (tim
 
 	// Check if the duration is at least 15 minutes and not more than 1 hour
 	duration := endTime.Sub(startTime)
-	if duration < 15*time.Minute || duration > 1*time.Hour {
+	if duration < 15*time.Minute || duration > 4*time.Hour {
 		return time.Time{}, time.Time{}, util.WrapGQLError(ctx, "booking duration must be between 15 minutes and 1 hour", http.StatusConflict, util.ErrorFlagValidateFail)
 	}
 

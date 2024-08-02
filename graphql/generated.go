@@ -144,13 +144,13 @@ type ComplexityRoot struct {
 		GetAvailableRooms func(childComplexity int, input ent.GetAvailableRoomInput) int
 		GetBooking        func(childComplexity int, bookingID string) int
 		GetBookings       func(childComplexity int, pagination *ent.PaginationInput, filter *ent.BookingFilter) int
+		GetMe             func(childComplexity int) int
 		GetOffice         func(childComplexity int, officeID string) int
 		GetOffices        func(childComplexity int) int
 		GetRole           func(childComplexity int, roleID string) int
 		GetRoles          func(childComplexity int) int
 		GetRoom           func(childComplexity int, roomID string) int
 		GetRooms          func(childComplexity int, pagination *ent.PaginationInput, filter ent.RoomFilter) int
-		GetUserByOid      func(childComplexity int, oID string) int
 	}
 
 	Role struct {
@@ -234,7 +234,7 @@ type QueryResolver interface {
 	GetAvailableRooms(ctx context.Context, input ent.GetAvailableRoomInput) ([]*ent.AvailableRoomResponse, error)
 	GetBookings(ctx context.Context, pagination *ent.PaginationInput, filter *ent.BookingFilter) (*ent.BookingDataResponse, error)
 	GetBooking(ctx context.Context, bookingID string) (*ent.BookingData, error)
-	GetUserByOid(ctx context.Context, oID string) (*ent.UserData, error)
+	GetMe(ctx context.Context) (*ent.UserData, error)
 	GetAdminUsers(ctx context.Context, pagination *ent.PaginationInput, keyword *string) (*ent.UserDataResponse, error)
 	GetRoles(ctx context.Context) ([]*ent.Role, error)
 	GetRole(ctx context.Context, roleID string) (*ent.Role, error)
@@ -765,6 +765,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetBookings(childComplexity, args["pagination"].(*ent.PaginationInput), args["filter"].(*ent.BookingFilter)), true
 
+	case "Query.GetMe":
+		if e.complexity.Query.GetMe == nil {
+			break
+		}
+
+		return e.complexity.Query.GetMe(childComplexity), true
+
 	case "Query.GetOffice":
 		if e.complexity.Query.GetOffice == nil {
 			break
@@ -826,18 +833,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetRooms(childComplexity, args["pagination"].(*ent.PaginationInput), args["filter"].(ent.RoomFilter)), true
-
-	case "Query.GetUserByOID":
-		if e.complexity.Query.GetUserByOid == nil {
-			break
-		}
-
-		args, err := ec.field_Query_GetUserByOID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetUserByOid(childComplexity, args["oID"].(string)), true
 
 	case "Role.description":
 		if e.complexity.Role.Description == nil {
@@ -1283,30 +1278,29 @@ input UpdateOfficeInput {
 	{Name: "../schema/query.graphql", Input: `type Query {
   # Office
   GetOffices: [OfficeDTO!]!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
   GetOffice(officeID: UUID!): OfficeDTO!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
 
   # Room
   GetRooms(pagination: PaginationInput, filter: RoomFilter!): RoomDataResponse!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
   GetRoom(roomID: UUID!): Room!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
   GetAvailableRooms(input: GetAvailableRoomInput!): [AvailableRoomResponse!]!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
 
   # Booking
   GetBookings(
     pagination: PaginationInput
     filter: BookingFilter
   ): BookingDataResponse!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
   GetBooking(bookingID: UUID!): BookingData!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  @hasRole(roles: ["super_admin", "administrator", "user"])
 
   # User
-  GetUserByOID(oID: UUID!): UserData!
-    @hasRole(roles: ["super_admin", "administrator", "user"])
+  GetMe: UserData! @hasRole(roles: ["super_admin", "administrator", "user"])
   GetAdminUsers(
     pagination: PaginationInput
     keyword: String
@@ -1756,21 +1750,6 @@ func (ec *executionContext) field_Query_GetRooms_args(ctx context.Context, rawAr
 		}
 	}
 	args["filter"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_GetUserByOID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["oID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("oID"))
-		arg0, err = ec.unmarshalNUUID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["oID"] = arg0
 	return args, nil
 }
 
@@ -5445,8 +5424,8 @@ func (ec *executionContext) fieldContext_Query_GetBooking(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_GetUserByOID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetUserByOID(ctx, field)
+func (ec *executionContext) _Query_GetMe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetMe(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5460,7 +5439,7 @@ func (ec *executionContext) _Query_GetUserByOID(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetUserByOid(rctx, fc.Args["oID"].(string))
+			return ec.resolvers.Query().GetMe(rctx)
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []interface{}{"super_admin", "administrator", "user"})
@@ -5500,7 +5479,7 @@ func (ec *executionContext) _Query_GetUserByOID(ctx context.Context, field graph
 	return ec.marshalNUserData2ᚖgitlabᚗtechvifyᚗdevᚋitsᚋinternshipᚋq2ᚑ2024ᚋprojectᚋmeetingᚑroomᚑreservationᚋmeetingᚑroomᚑreservationᚑbeᚋentᚐUserData(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_GetUserByOID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_GetMe(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -5519,17 +5498,6 @@ func (ec *executionContext) fieldContext_Query_GetUserByOID(ctx context.Context,
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserData", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_GetUserByOID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -10409,7 +10377,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "GetUserByOID":
+		case "GetMe":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10418,7 +10386,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_GetUserByOID(ctx, field)
+				res = ec._Query_GetMe(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

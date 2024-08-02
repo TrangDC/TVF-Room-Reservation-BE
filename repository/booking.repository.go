@@ -88,7 +88,7 @@ func (rps *bookingRepoImpl) GetBooking(ctx context.Context, id uuid.UUID) (*ent.
 
 // Mutation functions
 func (rps *bookingRepoImpl) CreateBooking(ctx context.Context, input dto.CreateBookingInputDTO) (*ent.Booking, error) {
-	oid := ctx.Value("user_id").(uuid.UUID)
+	userID := ctx.Value("user_id").(uuid.UUID)
 
 	// Set default value for isRepeat if it's nil
 	isRepeat := false
@@ -105,7 +105,7 @@ func (rps *bookingRepoImpl) CreateBooking(ctx context.Context, input dto.CreateB
 		SetIsRepeat(isRepeat).
 		SetOfficeID(input.OfficeID).
 		SetRoomID(input.RoomID).
-		SetUserID(oid).
+		SetUserID(userID).
 		Save(ctx)
 
 	if err != nil {

@@ -20,7 +20,7 @@ import (
 type UserService interface {
 	// Queries
 	GetUser(ctx context.Context, id uuid.UUID) (*ent.User, error)
-	GetUserByOID(ctx context.Context, oid uuid.UUID) (*ent.UserData, error)
+	GetMe(ctx context.Context) (*ent.UserData, error)
 	GetAdminUsers(ctx context.Context, pagination *ent.PaginationInput, keyword *string) (*ent.UserDataResponse, error)
 
 	// Mutations
@@ -48,8 +48,9 @@ func (svc *userSvcImpl) GetUser(ctx context.Context, id uuid.UUID) (*ent.User, e
 	return svc.repoRegistry.User().GetUser(ctx, id)
 }
 
-func (svc *userSvcImpl) GetUserByOID(ctx context.Context, oid uuid.UUID) (*ent.UserData, error) {
-	user, err := svc.repoRegistry.User().GetUserByOID(ctx, oid.String())
+func (svc *userSvcImpl) GetMe(ctx context.Context) (*ent.UserData, error) {
+	userID := ctx.Value("user_id").(uuid.UUID)
+	user, err := svc.repoRegistry.User().GetUser(ctx, userID)
 	if err != nil {
 		return nil, util.WrapGQLError(ctx, err.Error(), http.StatusNotFound, util.ErrorFlagNotFound)
 	}

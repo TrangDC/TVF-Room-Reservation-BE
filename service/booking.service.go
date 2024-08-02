@@ -47,9 +47,12 @@ func NewBookingService(repoRegistry repository.Repository, logger *zap.Logger) B
 // Query functions
 func (svc *bookingSvcImpl) GetBookings(ctx context.Context, pagination *ent.PaginationInput, filter *ent.BookingFilter) (*ent.BookingDataResponse, error) {
 	// Initialize filter parameters to default values
-	var startDateTime, endDateTime *time.Time
-	var officeID, roomID *uuid.UUID
-	var keyword *string
+	var (
+		result                     *ent.BookingDataResponse
+		startDateTime, endDateTime *time.Time
+		officeID, roomID           *uuid.UUID
+		keyword                    *string
+	)
 
 	if filter != nil {
 		var err error
@@ -62,8 +65,6 @@ func (svc *bookingSvcImpl) GetBookings(ctx context.Context, pagination *ent.Pagi
 			keyword = filter.Keyword
 		}
 	}
-
-	var results *ent.BookingDataResponse
 
 	query := svc.repoRegistry.Booking().BuildQuery()
 
@@ -93,7 +94,7 @@ func (svc *bookingSvcImpl) GetBookings(ctx context.Context, pagination *ent.Pagi
 
 	bookings, err := svc.repoRegistry.Booking().BuildList(ctx, query)
 	if err != nil {
-		return results, util.WrapGQLError(ctx, err.Error(), http.StatusInternalServerError, util.ErrorFlagInternalError)
+		return result, util.WrapGQLError(ctx, err.Error(), http.StatusInternalServerError, util.ErrorFlagInternalError)
 	}
 
 	// Render booking data
@@ -106,10 +107,11 @@ func (svc *bookingSvcImpl) GetBookings(ctx context.Context, pagination *ent.Pagi
 		data = append(data, datum)
 	}
 
-	return &ent.BookingDataResponse{
+	result = &ent.BookingDataResponse{
 		Total: total,
 		Data:  data,
-	}, nil
+	}
+	return result, nil
 }
 
 func (svc *bookingSvcImpl) GetBooking(ctx context.Context, id uuid.UUID) (*ent.BookingData, error) {
@@ -294,10 +296,13 @@ func (svc *bookingSvcImpl) CancelBooking(ctx context.Context, id uuid.UUID) (str
 
 // Common functions
 func (svc *bookingSvcImpl) renderBookingData(ctx context.Context, booking *ent.Booking) (*ent.BookingData, error) {
-	var office *ent.Office
-	var room *ent.Room
-	var user *ent.User
-	var err error
+	var (
+		office    *ent.Office
+		room      *ent.Room
+		user      *ent.User
+		err       error
+		deletedAt *time.Time
+	)
 
 	isTestEnv := svc.isTestEnv
 
@@ -328,7 +333,6 @@ func (svc *bookingSvcImpl) renderBookingData(ctx context.Context, booking *ent.B
 		}
 	}
 
-	var deletedAt *time.Time
 	if !booking.DeletedAt.IsZero() {
 		deletedAtUTC := booking.DeletedAt.In(time.UTC)
 		deletedAt = &deletedAtUTC
@@ -579,7 +583,7 @@ func validateBookingTime(ctx context.Context, startDate, endDate time.Time) (tim
 	// Check if the duration is at least 15 minutes and not more than 1 hour
 	duration := endTime.Sub(startTime)
 	if duration < 15*time.Minute || duration > 4*time.Hour {
-		return time.Time{}, time.Time{}, util.WrapGQLError(ctx, "booking duration must be between 15 minutes and 1 hour", http.StatusConflict, util.ErrorFlagValidateFail)
+		return time.Time{}, time.Time{}, util.WrapGQLError(ctx, "booking duration must be between 15 minutes and 4 hours", http.StatusConflict, util.ErrorFlagValidateFail)
 	}
 
 	// Check if the booking is on a weekend

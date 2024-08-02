@@ -22,7 +22,6 @@ type UserRepository interface {
 	BuildExist(ctx context.Context, query *ent.UserRoleQuery, userID, roleID uuid.UUID) (bool, error)
 
 	GetUser(ctx context.Context, id uuid.UUID) (*ent.User, error)
-	GetUserByOID(ctx context.Context, oid string) (*ent.User, error)
 	GetUserByEmail(ctx context.Context, workEmail string) (*ent.User, error)
 
 	// Mutations
@@ -98,11 +97,6 @@ func (rps *userRepoImpl) BuildExist(ctx context.Context, query *ent.UserRoleQuer
 // Query functions
 func (rps userRepoImpl) GetUser(ctx context.Context, id uuid.UUID) (*ent.User, error) {
 	query := rps.BuildQuery().Where(user.IDEQ(id))
-	return rps.BuildGet(ctx, query)
-}
-
-func (rps userRepoImpl) GetUserByOID(ctx context.Context, oid string) (*ent.User, error) {
-	query := rps.BuildQuery().Where(user.OidEQ(oid))
 	return rps.BuildGet(ctx, query)
 }
 

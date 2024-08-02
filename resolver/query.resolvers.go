@@ -66,13 +66,9 @@ func (r *queryResolver) GetBooking(ctx context.Context, bookingID string) (*ent.
 	return r.serviceRegistry.Booking().GetBooking(ctx, id)
 }
 
-// GetUserByOid is the resolver for the GetUserByOID field.
-func (r *queryResolver) GetUserByOid(ctx context.Context, oID string) (*ent.UserData, error) {
-	userOID, err := uuid.Parse(oID)
-	if err != nil {
-		return nil, util.WrapGQLError(ctx, "failed to parse user oid", http.StatusConflict, util.ErrorFlagValidateFail)
-	}
-	return r.serviceRegistry.User().GetUserByOID(ctx, userOID)
+// GetMe is the resolver for the GetMe field.
+func (r *queryResolver) GetMe(ctx context.Context) (*ent.UserData, error) {
+	return r.serviceRegistry.User().GetMe(ctx)
 }
 
 // GetAdminUsers is the resolver for the GetAdminUsers field.
